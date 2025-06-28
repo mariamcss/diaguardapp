@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -97,7 +96,6 @@ class _GlucoseAlertSettingsState extends State<GlucoseAlertSettings> {
   }
 }
 
-// ✅ دالة يتم استدعاؤها بعد قراءة سكر (صائم أو غير صائم)
 Future<void> checkGlucoseAndTriggerAlert(BuildContext context, double sugar) async {
   final prefs = await SharedPreferences.getInstance();
   final low = prefs.getDouble('lowThreshold') ?? 70.0;
@@ -105,13 +103,11 @@ Future<void> checkGlucoseAndTriggerAlert(BuildContext context, double sugar) asy
 
   if (sugar < low || sugar > high) {
     final emergencyName = prefs.getString('emergencyName') ?? 'شخص للطوارئ';
-    final emergencyPhone = prefs.getString('emergencyPhone') ?? '0000000000';
+    final emergencyPhone = prefs.getString('emergencyPhone') ?? '';
 
-    // ✅ صوت تنبيه
     final player = AudioPlayer();
     await player.play(AssetSource('sounds/alarm.mp3'));
 
-    // ✅ إظهار تنبيه حوار
     showDialog(
       context: context,
       builder: (_) => AlertDialog(

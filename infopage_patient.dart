@@ -39,6 +39,45 @@ class PatientInformation extends StatefulWidget {
   @override
   _PatientInformationState createState() => _PatientInformationState();
 }
+Future<void> checkGlucoseAndTriggerAlert(BuildContext context, double sugar) async {
+  final prefs = await SharedPreferences.getInstance();
+  final low = prefs.getDouble('lowThreshold') ?? 70.0;
+  final high = prefs.getDouble('highThreshold') ?? 180.0;
+  final emergencyName = prefs.getString('emergencyName') ?? 'شخص الطوارئ';
+  final emergencyPhone = prefs.getString('emergencyPhone') ?? '000';
+
+  if (sugar < low || sugar > high) {
+    final player = AudioPlayer();
+    await player.play(AssetSource('sounds/alarm.mp3'));
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('🚨 تنبيه سكر'),
+        content: Text(
+          sugar < low
+              ? 'انخفاض في مستوى السكر!\nيرجى التواصل مع $emergencyName على $emergencyPhone'
+              : 'ارتفاع في مستوى السكر!\nيرجى التواصل مع $emergencyName على $emergencyPhone',
+        ),
+        actions: [
+          TextButton(
+            child: Text('اتصال'),
+            onPressed: () async {
+              final uri = Uri.parse('tel:$emergencyPhone');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri);
+              }
+            },
+          ),
+          TextButton(
+            child: Text('إغلاق'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 DateTime dt = DateTime.now();
 intl.DateFormat formatter = intl.DateFormat('dd-MM-yyyy');
@@ -1046,4 +1085,6 @@ class _PatientInformationState extends State<PatientInformation> {
 }
 
 List<Widget> cardListBefore = [];
+
+
 List<Widget> cardListAfter = [];

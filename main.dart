@@ -63,6 +63,10 @@ class MyApp extends StatelessWidget {
               authService: AuthService(),
             ),
         '/chatbot_patient': (context) => ChatbotPatientPage(), 
+        
+          '/glucose_alert': (context) => GlucoseAlertSettings(),
+
+
       },
     );
   }
